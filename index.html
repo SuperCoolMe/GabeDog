@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dog walking &amp; home visits — Gabriel Rhodes</title>
+<meta name="description" content="Patient weekday dog walking and in-home visits in Los Altos, Los Altos Hills, Mountain View, Sunnyvale, and nearby. All sizes. Nervous dogs, senior dogs, and special needs dogs welcome.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E2B24;
+    --moss:#33473A;
+    --fern:#6E8F6B;
+    --mist:#E5E9E3;
+    --chalk:#F7F8F5;
+    --amber:#C6822F;
+    --line:rgba(46,64,52,.14);
+
+    --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+    --body:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+
+    --rail:64px;
+    --gutter:24px;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    background:var(--mist);
+    color:var(--ink);
+    font-family:var(--body);
+    font-weight:300;
+    font-size:clamp(1.0625rem,0.98rem + 0.4vw,1.1875rem);
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  ::selection{background:var(--amber);color:var(--chalk)}
+  a{color:inherit}
+  img{display:block;max-width:100%;height:auto}
+
+  :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+
+  /* ---- top bar ---- */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    background:var(--chalk);
+  }
+  .topbar .inner{
+    max-width:1000px;
+    margin:0 auto;
+    padding:.85rem var(--gutter);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:.75rem;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+  }
+  .topbar .name{color:var(--moss);font-weight:500}
+  .topbar a{text-decoration:none;color:var(--moss)}
+  .topbar .call{color:var(--amber);font-weight:500;border-bottom:1px solid currentColor;padding-bottom:1px}
+  .topbar .call:hover{color:var(--ink)}
+
+  .page{
+    max-width:1000px;
+    margin:0 auto;
+    padding:0 var(--gutter);
+    display:grid;
+    grid-template-columns:var(--rail) minmax(0,1fr);
+  }
+
+  /* ---- the route ---- */
+  .rail{position:relative}
+  .route{position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .route .base{fill:none;stroke:var(--fern);stroke-width:1.5;stroke-opacity:.45;stroke-linecap:round;stroke-dasharray:1 6}
+  .route .walked{fill:none;stroke:var(--moss);stroke-width:2;stroke-linecap:round}
+  .route .stop{fill:var(--mist);stroke:var(--fern);stroke-width:1.5}
+  .route .stop.reached{fill:var(--amber);stroke:var(--amber)}
+  .route .walker{fill:var(--moss);opacity:0}
+  .route .walker.on{opacity:1}
+
+  /* ---- sections ---- */
+  .col > section{padding:clamp(4rem,9vh,7rem) 0;border-top:1px solid var(--line)}
+  .col > section:first-child{border-top:0;padding-top:clamp(3rem,7vh,4.5rem)}
+
+  .stop-label{
+    font-family:var(--mono);
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--fern);
+    margin:0 0 1.4rem;
+  }
+
+  h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+  h1{font-size:clamp(2.3rem,1.4rem + 4.2vw,3.9rem);font-weight:800;line-height:.99;letter-spacing:-.03em;max-width:14ch}
+  h1 em{font-family:var(--body);font-style:italic;font-weight:300;letter-spacing:-.01em}
+  h2{font-size:clamp(1.6rem,1.2rem + 1.5vw,2.25rem);line-height:1.1;letter-spacing:-.02em;max-width:20ch}
+  h3{font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
+
+  p{margin:1.1em 0 0;max-width:60ch}
+  .lede{font-size:clamp(1.1rem,1rem + 0.5vw,1.32rem);line-height:1.5;margin-top:1.5rem;max-width:42ch}
+  section > h2 + p{margin-top:1.4rem}
+
+  .hero-note{
+    font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--moss);margin-top:2.2rem;max-width:none;
+  }
+
+  /* ---- hero layout ---- */
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(1.6rem,4vw,3rem);align-items:center}
+  @media (max-width:880px){.hero-grid{grid-template-columns:1fr}}
+
+  /* ---- photos ---- */
+  figure{margin:0}
+  .shot img{
+    border-radius:14px;
+    border:1px solid var(--line);
+    width:100%;
+    object-fit:cover;
+    background:var(--chalk);
+  }
+  .shot figcaption{
+    font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--fern);margin-top:.7rem;line-height:1.5;
+  }
+  .shot.tall img{aspect-ratio:4/5}
+  .shot.wide img{aspect-ratio:5/4}
+  .band{display:grid;gap:1.4rem;margin-top:2.6rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .after{margin-top:2.6rem}
+
+  /* ---- call to action ---- */
+  .cta-row{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:2.2rem;align-items:center}
+  .btn{
+    display:inline-block;font-family:var(--display);font-size:.95rem;font-weight:600;
+    letter-spacing:-.005em;text-decoration:none;padding:.78em 1.5em;border-radius:999px;
+    background:var(--moss);color:var(--chalk);border:1.5px solid var(--moss);
+    transition:background .18s ease,color .18s ease,transform .18s ease;
+  }
+  .btn:hover{background:var(--ink);border-color:var(--ink);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--moss)}
+  .btn.ghost:hover{background:var(--moss);color:var(--chalk)}
+
+  /* ---- price sheet ---- */
+  .rates{list-style:none;margin:2.4rem 0 0;padding:0;border-top:1px solid var(--line)}
+  .rates li{padding:1.3rem 0;border-bottom:1px solid var(--line)}
+  .rates .head{display:flex;justify-content:space-between;align-items:baseline;gap:1.2rem;flex-wrap:wrap}
+  .rates .price{font-family:var(--mono);font-size:.95rem;font-weight:500;color:var(--amber);white-space:nowrap}
+  .rates p{margin-top:.45rem;font-size:.99rem;line-height:1.55;max-width:52ch}
+
+  .note{
+    margin-top:2.2rem;background:var(--chalk);border:1px solid var(--line);
+    border-radius:14px;padding:1.4rem 1.5rem;
+  }
+  .note p{margin:0;font-size:1.02rem;max-width:52ch}
+  .note strong{font-family:var(--display);font-weight:600}
+
+  /* ---- dogs ---- */
+  .dogs{display:grid;gap:1.6rem;margin-top:2.6rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .dog{background:var(--chalk);border-radius:14px;padding:1.5rem 1.4rem 1.7rem;border:1px solid var(--line)}
+  .dog .tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:.7rem}
+  .dog p{font-size:.99rem;max-width:40ch}
+
+  .pull{
+    font-family:var(--display);font-weight:400;
+    font-size:clamp(1.28rem,1.05rem + 1vw,1.7rem);line-height:1.25;letter-spacing:-.02em;
+    margin-top:2.4rem;padding-left:1.2rem;border-left:3px solid var(--amber);max-width:30ch;
+  }
+
+  /* ---- testimonials ---- */
+  .quotes{display:grid;gap:1.6rem;margin-top:2.4rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .quote{
+    background:var(--chalk);border:1px solid var(--line);border-radius:14px;
+    padding:1.6rem 1.5rem 1.5rem;display:flex;flex-direction:column;
+  }
+  .quote blockquote{
+    margin:0;font-size:1.08rem;line-height:1.5;
+  }
+  .quote blockquote::before{content:"\201C"}
+  .quote blockquote::after{content:"\201D"}
+  .quote cite{
+    font-family:var(--mono);font-style:normal;font-size:.72rem;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--fern);margin-top:1.1rem;line-height:1.6;
+  }
+  .quote cite b{color:var(--moss);font-weight:500}
+
+  /* ---- contact ---- */
+  .contact-lines{list-style:none;margin:2.2rem 0 0;padding:0;display:grid;gap:.9rem}
+  .contact-lines li{display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap}
+  .contact-lines .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fern);min-width:5.5rem}
+  .contact-lines .v{font-size:1.12rem}
+  .contact-lines a{text-decoration:none;border-bottom:1px solid var(--amber);padding-bottom:1px}
+  .contact-lines a:hover{color:var(--amber)}
+
+  footer{
+    grid-column:1/-1;border-top:1px solid var(--line);padding:2.2rem 0 3rem;
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--fern);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  }
+
+  @media (max-width:720px){
+    :root{--rail:30px;--gutter:18px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{transition:none !important}
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"LocalBusiness",
+  "name":"Gabriel Rhodes — Dog Walking & Home Visits",
+  "description":"Weekday dog walking and in-home pet care. All sizes and ages, including nervous, senior, and special needs dogs.",
+  "telephone":"+1-650-867-1296",
+  "email":"gabrielcrhodes@gmail.com",
+  "address":{"@type":"PostalAddress","addressLocality":"Los Altos","addressRegion":"CA","addressCountry":"US"},
+  "areaServed":[
+    {"@type":"City","name":"Los Altos"},
+    {"@type":"City","name":"Los Altos Hills"},
+    {"@type":"City","name":"Mountain View"},
+    {"@type":"City","name":"Sunnyvale"},
+    {"@type":"City","name":"San Jose"}
+  ],
+  "openingHours":"Mo-Fr 09:00-17:00"
+}
+</script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <span class="name">Gabriel Rhodes · Dog walking &amp; home visits</span>
+    <a class="call" href="tel:6508671296">Call 650-867-1296</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="rail" aria-hidden="true">
+    <svg class="route" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path class="base" d=""></path>
+      <path class="walked" d=""></path>
+      <g class="stops"></g>
+      <circle class="walker" r="4.5" cx="0" cy="0"></circle>
+    </svg>
+  </div>
+
+  <main class="col">
+
+    <section id="start" data-stop>
+      <div class="hero-grid">
+        <div>
+          <p class="stop-label">Dog walking &amp; home visits · Los Altos, CA</p>
+          <h1>A patient walk, at <em>your dog's</em> pace.</h1>
+          <p class="lede">I come to your home during the week to walk, feed, and/or keep your dog company. Nervous dogs, senior dogs, and dogs who need a little extra time are welcome — they're what I'm best at.</p>
+          <div class="cta-row">
+            <a class="btn" href="mailto:gabrielcrhodes@gmail.com?subject=Meet%20and%20greet%20—%20dog%20walking">Book a meet and greet</a>
+            <a class="btn ghost" href="#rates">See visits &amp; rates</a>
+          </div>
+          <p class="hero-note">Weekday mornings and afternoons · Every size, every age</p>
+        </div>
+        <figure class="shot wide">
+          <img src="images/portrait-puppy.jpg" alt="Gabriel Rhodes outside, holding a chocolate Labrador puppy against his shoulder." width="1600" height="1280">
+        </figure>
+      </div>
+    </section>
+
+    <section id="rates" data-stop>
+      <p class="stop-label">Visits &amp; rates</p>
+      <h2>You pick what your dog needs.</h2>
+      <p>Every dog is different, so nothing here is a package deal. Tell me what your day looks like and we'll settle on a visit that fits it.</p>
+
+      <ul class="rates">
+        <li>
+          <div class="head"><h3>Walk — 30 minutes</h3><span class="price">$30</span></div>
+          <p>Out on the street or the trail, on your dog's terms. Exercise, sniffing, and a bathroom stop, all at whatever pace they can handle.</p>
+        </li>
+        <li>
+          <div class="head"><h3>Walk — 60 minutes</h3><span class="price">$50</span></div>
+          <p>For dogs who need real mileage before they'll settle. Longer route, more sniffing, and time to work on anything you'd like me to reinforce.</p>
+        </li>
+        <li>
+          <div class="head"><h3>Home visit — 30 minutes</h3><span class="price">$30</span></div>
+          <p>For dogs who'd rather not go far. Company on the floor, a meal or medication on your schedule, and a trip to the yard.</p>
+        </li>
+        <li>
+          <div class="head"><h3>Quick bathroom break — 15 minutes</h3><span class="price">$20</span></div>
+          <p>Sometimes the day just runs long. A short trip outside so nobody has to hold it until six.</p>
+        </li>
+        <li>
+          <div class="head"><h3>Each additional dog in the same home</h3><span class="price">+$10</span></div>
+          <p>Same visit, more hands-on time. I keep multi-dog walks to households that already live together unless you tell me otherwise.</p>
+        </li>
+      </ul>
+
+      <div class="note">
+        <p><strong>No weight limit and no surcharge for hard cases.</strong> Big dogs, senior dogs, blind or deaf dogs, dogs on medication, dogs who need a slow introduction to a new person.</p>
+        <p style="margin-top:.9rem"><strong>One-on-one, always.</strong> No other clients' dogs join your dog's walk or visit — the only exception is dogs who already live together. It's the reason a solo visit costs more than a group walk, and the reason your dog gets my full attention the entire time.</p>
+      </div>
+
+      <div class="band">
+        <figure class="shot wide">
+          <img src="images/spaniel.jpg" alt="A cream cocker spaniel sitting in a grassy yard, looking at the camera." loading="lazy" width="1600" height="1280">
+          <figcaption>Other people's dogs, in their own yards and on their own routes.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <img src="images/lab-watching.jpg" alt="A yellow Labrador in a driveway, watching something off to the side." loading="lazy" width="1600" height="1280">
+          <figcaption>Half the job is noticing what they've noticed.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="how" data-stop>
+      <p class="stop-label">How I walk</p>
+      <h2>I'm watching the whole street, not just the leash.</h2>
+      <p>The loose dog up ahead. The kid who wants to say hi. The jogger coming around the corner. I see those before your dog does, and I plan around them.</p>
+      <p>I'm reading your dog the entire time, too. A stiff tail, a hard stare, a sudden freeze, a shift to the far side of the sidewalk — those all mean something, and they change what we do next. Most trouble on a walk is avoidable if you notice it thirty seconds early.</p>
+      <p>The other half is knowing when nothing's wrong. If your dog wants to play, I'll play. If your dog wants to stand still and smell one bush for four minutes, that's a good walk too.</p>
+      <p class="pull">A walk should end with a dog who's tired, not a dog who's rattled.</p>
+    </section>
+
+    <section id="dogs" data-stop>
+      <p class="stop-label">The two who taught me</p>
+      <h2>My experience came from living with it.</h2>
+      <p>I've looked after dogs of every size and age, but the specialized care I'm most confident about came from my own two.</p>
+
+      <div class="dogs">
+        <div class="dog">
+          <span class="tag">Chocolate Lab · large</span>
+          <h3>Strong, and delighted about it</h3>
+          <p>He taught me how to handle a big dog who could pull me over if I let him — and how to keep that from ever becoming a contest.</p>
+        </div>
+        <div class="dog">
+          <span class="tag">Boston Terrier · small, senior, blind</span>
+          <h3>He taught me everything else</h3>
+          <p>Getting a blind dog through a house and down a sidewalk takes patience, narration, and constant attention. Special needs care isn't a line on a list for me. It's my Tuesday.</p>
+        </div>
+      </div>
+
+      <div class="band">
+        <figure class="shot tall">
+          <img src="images/portrait-boston.jpg" alt="Gabriel Rhodes holding his elderly Boston Terrier, the two of them nose to nose." loading="lazy" width="1067" height="1600">
+          <figcaption>Blind since [AGE]. He still knows exactly where I am.</figcaption>
+        </figure>
+        <figure class="shot tall">
+          <img src="images/couch-both-dogs.jpg" alt="Gabriel Rhodes lying on a couch between a sleeping Labrador and a sleeping Boston Terrier." loading="lazy" width="1600" height="1200">
+          <figcaption>The other qualification: I am extremely easy to nap on.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="said" data-stop>
+      <p class="stop-label">What owners say</p>
+      <h2>The people who've handed me their keys.</h2>
+
+      <div class="quotes">
+        <figure class="quote">
+          <blockquote>[PASTE THE FIRST TESTIMONIAL HERE — two or three sentences is plenty.]</blockquote>
+          <cite><b>[FIRST NAME, LAST INITIAL]</b><br>[DOG'S NAME], [BREED]</cite>
+        </figure>
+        <figure class="quote">
+          <blockquote>[PASTE THE SECOND TESTIMONIAL HERE.]</blockquote>
+          <cite><b>[FIRST NAME, LAST INITIAL]</b><br>[DOG'S NAME], [BREED]</cite>
+        </figure>
+      </div>
+    </section>
+
+    <section id="when" data-stop>
+      <p class="stop-label">Where and when</p>
+      <h2>Weekdays, while you're at work and your dog is watching the door.</h2>
+      <p>I'm based in Los Altos and I travel about ten miles out — Los Altos Hills, Mountain View, Sunnyvale, and parts of San Jose. If you're just past that line, ask anyway; it depends on the day.</p>
+      <p>I'm filling out my weekday schedule with the work I actually want to be doing. My own dogs have plenty of support at home, so my time and attention go to yours.</p>
+      <p>Morning and afternoon are wide open. If you need something outside that, feel free to ask.</p>
+    </section>
+
+    <section id="contact" data-stop>
+      <p class="stop-label">Get in touch</p>
+      <h2>Tell me about your dog.</h2>
+      <p>Name, size, age, and anything that makes them nervous. If there's a route they love or a stranger they hate, I want to know that first. We'll start with a short meet and greet at your place, free, so your dog sees me once before they're ever alone with me.</p>
+      <ul class="contact-lines">
+        <li><span class="k">Email</span><span class="v"><a href="mailto:gabrielcrhodes@gmail.com?subject=Meet%20and%20greet%20—%20dog%20walking">gabrielcrhodes@gmail.com</a></span></li>
+        <li><span class="k">Phone</span><span class="v"><a href="tel:6508671296">650-867-1296</a></span></li>
+        <li><span class="k">Area</span><span class="v">Los Altos and about ten miles out &mdash; Los Altos Hills, Mountain View, Sunnyvale, and parts of San Jose</span></li>
+        <li><span class="k">Hours</span><span class="v">Monday to Friday, morning through late afternoon</span></li>
+      </ul>
+      <div class="cta-row">
+        <a class="btn" href="mailto:gabrielcrhodes@gmail.com?subject=Meet%20and%20greet%20—%20dog%20walking">Book a meet and greet</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Gabriel Rhodes · Dog walking &amp; home visits</span>
+    <span>Los Altos, CA · 650-867-1296</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var rail   = document.querySelector('.rail');
+  var svg    = document.querySelector('.route');
+  var base   = svg.querySelector('.base');
+  var walked = svg.querySelector('.walked');
+  var stopsG = svg.querySelector('.stops');
+  var walker = svg.querySelector('.walker');
+  var stops  = Array.prototype.slice.call(document.querySelectorAll('[data-stop]'));
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  var circles = [], len = 0;
+
+  function build(){
+    var rw = rail.clientWidth, rh = rail.clientHeight;
+    if(!rw || !rh || stops.length < 2) return;
+
+    svg.setAttribute('viewBox', '0 0 ' + rw + ' ' + rh);
+
+    var railTop = rail.getBoundingClientRect().top + window.pageYOffset;
+    var mid = rw / 2;
+    var sway = Math.min(rw * 0.30, 13);
+
+    var pts = stops.map(function(el, i){
+      var r = el.getBoundingClientRect();
+      return { x: mid + (i % 2 ? sway : -sway), y: r.top + window.pageYOffset - railTop + 26 };
+    });
+
+    pts.unshift({ x: pts[0].x, y: 0 });
+    pts.push({ x: pts[pts.length - 1].x, y: rh });
+
+    var d = 'M ' + pts[0].x + ' ' + pts[0].y;
+    for(var i = 1; i < pts.length; i++){
+      var p0 = pts[i-1], p1 = pts[i], c = (p0.y + p1.y) / 2;
+      d += ' C ' + p0.x + ' ' + c + ', ' + p1.x + ' ' + c + ', ' + p1.x + ' ' + p1.y;
+    }
+
+    base.setAttribute('d', d);
+    walked.setAttribute('d', d);
+    len = walked.getTotalLength();
+    walked.style.strokeDasharray = len;
+
+    stopsG.innerHTML = '';
+    circles = pts.slice(1, -1).map(function(p){
+      var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('class','stop');
+      c.setAttribute('cx', p.x);
+      c.setAttribute('cy', p.y);
+      c.setAttribute('r', 4);
+      stopsG.appendChild(c);
+      return c;
+    });
+
+    update();
+  }
+
+  function update(){
+    if(!len) return;
+
+    if(reduce.matches){
+      walked.style.strokeDashoffset = 0;
+      walker.classList.remove('on');
+      circles.forEach(function(c){ c.classList.add('reached'); });
+      return;
+    }
+
+    var railTop = rail.getBoundingClientRect().top + window.pageYOffset;
+    var marker  = window.pageYOffset + window.innerHeight * 0.55 - railTop;
+    var p = Math.max(0, Math.min(1, marker / rail.clientHeight));
+
+    walked.style.strokeDashoffset = len * (1 - p);
+
+    var pt = walked.getPointAtLength(len * p);
+    walker.setAttribute('cx', pt.x);
+    walker.setAttribute('cy', pt.y);
+    walker.classList.toggle('on', p > 0.005 && p < 0.995);
+
+    circles.forEach(function(c){
+      c.classList.toggle('reached', parseFloat(c.getAttribute('cy')) <= marker);
+    });
+  }
+
+  var ticking = false;
+  function onScroll(){
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){ update(); ticking = false; });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', build);
+  window.addEventListener('load', build);
+  document.querySelectorAll('img').forEach(function(img){
+    if(!img.complete) img.addEventListener('load', build, { once: true });
+  });
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(build); }
+  build();
+})();
+</script>
+
+</body>
+</html>
